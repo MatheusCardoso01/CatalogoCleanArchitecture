@@ -50,10 +50,44 @@ public class CategoriaService : ICategoriaService
         await _categoriaRepository.UpdateAsync(categoriaEntity);
     }
 
-    public async Task Remove(int id)
+    public async Task<CategoriaDTO> Remove(int id)
     {
         var categoriaEntity = await _categoriaRepository.GetByIdAsync(id);
 
         await _categoriaRepository.RemoveAsync(categoriaEntity);
+
+        return _mapper.Map<CategoriaDTO>(categoriaEntity);
+    }
+
+    public async Task<CategoriaDTO> Patch(int id, CategoriaPatchDTO categoriaPatchDTO)
+    { 
+        var categoria = await _categoriaRepository.GetByIdAsync(id);
+
+        string novoNome;
+        string novaImagemurl;
+
+        if (categoriaPatchDTO.Nome != null)
+        { 
+            novoNome = categoriaPatchDTO.Nome;
+        }
+        else
+        {
+            novoNome = categoria.Nome;
+        }
+
+        if (categoriaPatchDTO.Imagemurl != null)
+        {
+            novaImagemurl = categoriaPatchDTO.Imagemurl;
+        }
+        else
+        {
+            novaImagemurl = categoria.Imagemurl;
+        }
+
+        categoria.Update(novoNome, novaImagemurl);
+
+        await _categoriaRepository.UpdateAsync(categoria);
+
+        return _mapper.Map<CategoriaDTO>(categoria);
     }
 }

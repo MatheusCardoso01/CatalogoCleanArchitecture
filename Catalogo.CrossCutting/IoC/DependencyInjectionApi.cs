@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace Catalogo.CrossCutting.IoC;
 
-public static class DependencyInjection
+public static class DependencyInjectionApi
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfrastructureAPI(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseMySql(configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 43))));

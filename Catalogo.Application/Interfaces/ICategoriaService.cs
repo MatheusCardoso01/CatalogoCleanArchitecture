@@ -13,5 +13,6 @@ public interface ICategoriaService
     Task<CategoriaDTO> GetById(int id);
     Task Add(CategoriaDTO categoriaDto);
     Task Update(CategoriaDTO categoriaDto);
-    Task Remove(int id);
+    Task<CategoriaDTO> Remove(int id);
+    Task<CategoriaDTO?> Patch(int id, CategoriaPatchDTO categoriaPatchDTO);
 }

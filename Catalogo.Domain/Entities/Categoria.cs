@@ -42,4 +42,9 @@ public sealed class Categoria : Entity
         Nome = nome;
         Imagemurl = imagemUrl;
     }
+
+    public void Update(string nome, string imagemUrl)
+    {
+        ValidateDomain(nome, imagemUrl);
+    }
 }
