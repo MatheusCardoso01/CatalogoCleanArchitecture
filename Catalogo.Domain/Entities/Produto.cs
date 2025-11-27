@@ -16,7 +16,8 @@ public sealed class Produto : Entity
     public string Imagemurl { get; private set; }
     public int Estoque { get; private set; }
     public DateTime DataCadastro { get; private set; }
-    public int CategoriaId { get; private set; }
+    public int CategoriaId { get; set; }
+    public Categoria Categoria { get; set; }
 
     // construtores
     public Produto(string nome, string descricao, decimal preco, string imagemurl, int estoque, DateTime dataCadastro)
