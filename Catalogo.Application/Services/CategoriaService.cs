@@ -75,13 +75,13 @@ public class CategoriaService : ICategoriaService
             novoNome = categoria.Nome;
         }
 
-        if (categoriaPatchDTO.Imagemurl != null)
+        if (categoriaPatchDTO.ImagemUrl != null)
         {
-            novaImagemurl = categoriaPatchDTO.Imagemurl;
+            novaImagemurl = categoriaPatchDTO.ImagemUrl;
         }
         else
         {
-            novaImagemurl = categoria.Imagemurl;
+            novaImagemurl = categoria.ImagemUrl;
         }
 
         categoria.Update(novoNome, novaImagemurl);

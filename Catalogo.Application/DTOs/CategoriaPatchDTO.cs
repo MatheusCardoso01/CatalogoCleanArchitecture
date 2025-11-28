@@ -15,5 +15,5 @@ public class CategoriaPatchDTO
 
     [MinLength(5)]
     [MaxLength(250)]
-    public string Imagemurl { get; set; }
+    public string ImagemUrl { get; set; }
 }

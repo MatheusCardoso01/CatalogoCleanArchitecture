@@ -19,5 +19,5 @@ public class CategoriaDTO
     [Required(ErrorMessage = "Informe o nome da imagem")]
     [MinLength(5)]
     [MaxLength(250)]
-    public string Imagemurl { get; set; }
+    public string ImagemUrl { get; set; }
 }

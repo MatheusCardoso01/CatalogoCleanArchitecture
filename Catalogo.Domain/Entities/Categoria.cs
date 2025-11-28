@@ -12,7 +12,7 @@ public sealed class Categoria : Entity
 {
     // atributos
     public string Nome { get; private set; }
-    public string Imagemurl { get; private set; }
+    public string ImagemUrl { get; private set; }
     public ICollection<Produto> Produtos { get; set; }
 
     // construtores
@@ -24,7 +24,7 @@ public sealed class Categoria : Entity
     public Categoria(int id, string nome, string imagemUrl)
     {
         DomainExceptionValidation.When(id < 0, "valor de Id inválido");
-        id = id;
+        Id = id; // Assign to the base Entity's Id property
         ValidateDomain(nome, imagemUrl);
     }
 
@@ -40,7 +40,7 @@ public sealed class Categoria : Entity
         DomainExceptionValidation.When(imagemUrl.Length < 5, "O nome da imagem deve ter no mínimo 5 caracteres");
 
         Nome = nome;
-        Imagemurl = imagemUrl;
+        ImagemUrl = imagemUrl;
     }
 
     public void Update(string nome, string imagemUrl)

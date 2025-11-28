@@ -111,7 +111,7 @@ public class CategoriasController : ControllerBase
         var patchDTO = new CategoriaPatchDTO
         {
             Nome = categoriaAtual.Nome,
-            Imagemurl = categoriaAtual.Imagemurl
+            ImagemUrl = categoriaAtual.ImagemUrl
         };
 
         foreach (var operation in patchDoc.Operations)
@@ -126,7 +126,7 @@ public class CategoriasController : ControllerBase
                         patchDTO.Nome = operation.value?.ToString();
                         break;
                     case "imagemurl":
-                        patchDTO.Imagemurl = operation.value?.ToString();
+                        patchDTO.ImagemUrl = operation.value?.ToString();
                         break;
                 }
             }
@@ -138,7 +138,7 @@ public class CategoriasController : ControllerBase
                         patchDTO.Nome = null;
                         break;
                     case "imagemurl":
-                        patchDTO.Imagemurl = null;
+                        patchDTO.ImagemUrl = null;
                         break;
                 }
             }

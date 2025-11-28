@@ -15,7 +15,7 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
     {
         builder.HasKey(t => t.Id);
         builder.Property(c => c.Nome).HasMaxLength(100).IsRequired();
-        builder.Property(c => c.Imagemurl).HasMaxLength(100).IsRequired();
+        builder.Property(c => c.ImagemUrl).HasMaxLength(100).IsRequired();
 
         builder.HasData(
             new Categoria(1, "Material Escolar", "material.jpg"),
