@@ -43,16 +43,26 @@ public class CategoriaService : ICategoriaService
         await _categoriaRepository.CreateAsync(categoriaEntity);
     }
 
-    public async Task Update(CategoriaDTO categoriaDto)
+    public async Task<CategoriaDTO> Update(CategoriaDTO categoriaDTO)
     {
-        var categoriaEntity = _mapper.Map<Categoria>(categoriaDto);
+        var categoriaEntity = await _categoriaRepository.GetByIdAsync(categoriaDTO.Id); 
+
+        if (categoriaEntity is null)
+            return null;
+
+        categoriaEntity.Update(categoriaDTO.Nome, categoriaDTO.ImagemUrl);
 
         await _categoriaRepository.UpdateAsync(categoriaEntity);
+
+        return categoriaDTO;
     }
 
     public async Task<CategoriaDTO> Remove(int id)
     {
         var categoriaEntity = await _categoriaRepository.GetByIdAsync(id);
+
+        if (categoriaEntity is null)
+            return null;
 
         await _categoriaRepository.RemoveAsync(categoriaEntity);
 
@@ -63,18 +73,28 @@ public class CategoriaService : ICategoriaService
     { 
         var categoria = await _categoriaRepository.GetByIdAsync(id);
 
+        categoria = AplicarAlteracoes(categoria, categoriaPatchDTO);
+
+        await _categoriaRepository.UpdateAsync(categoria);
+
+        return _mapper.Map<CategoriaDTO>(categoria);
+    }
+
+    // métodos auxiliares
+
+    public Categoria AplicarAlteracoes(Categoria categoria, CategoriaPatchDTO categoriaPatchDTO)
+    {
         string novoNome;
         string novaImagemurl;
 
         if (categoriaPatchDTO.Nome != null)
-        { 
+        {
             novoNome = categoriaPatchDTO.Nome;
         }
         else
         {
             novoNome = categoria.Nome;
         }
-
         if (categoriaPatchDTO.ImagemUrl != null)
         {
             novaImagemurl = categoriaPatchDTO.ImagemUrl;
@@ -86,8 +106,6 @@ public class CategoriaService : ICategoriaService
 
         categoria.Update(novoNome, novaImagemurl);
 
-        await _categoriaRepository.UpdateAsync(categoria);
-
-        return _mapper.Map<CategoriaDTO>(categoria);
+        return categoria;
     }
 }

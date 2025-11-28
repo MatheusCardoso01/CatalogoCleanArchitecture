@@ -56,4 +56,5 @@ public sealed class Produto : Entity
         Estoque = estoque;
         DataCadastro = dataCadastro;
     }
+
 }

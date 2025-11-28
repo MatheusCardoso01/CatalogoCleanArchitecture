@@ -33,7 +33,7 @@ public class CategoriasController : ControllerBase
         return Ok(categoriasDTO);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "ObterCategorias")]
     public async Task<ActionResult<CategoriaDTO>> GetById(int id)
     { 
         var categoriaDTO = await _categoriaService.GetById(id);
@@ -55,7 +55,7 @@ public class CategoriasController : ControllerBase
         await _categoriaService.Add(categoriaDTO);
 
         return new CreatedAtRouteResult(
-            routeName: nameof(GetById),
+            routeName: "ObterCategorias",
             routeValues: new { id = categoriaDTO.Id },
             value: categoriaDTO
         );
@@ -64,12 +64,15 @@ public class CategoriasController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<CategoriaDTO>> Put([FromRoute] int id, [FromBody] CategoriaDTO categoriaDTO)
     {
-        if (id == 0 || categoriaDTO is null || id != categoriaDTO.Id)
+        if (id <= 0 || categoriaDTO is null || id != categoriaDTO.Id)
         { 
             return BadRequest("Dados inválidos.");
         }
 
-        await _categoriaService.Update(categoriaDTO);
+        categoriaDTO = await _categoriaService.Update(categoriaDTO);
+
+        if (categoriaDTO is null)
+            return NotFound("Categoria não encontrada.");
 
         return Ok(categoriaDTO);
     }
@@ -86,9 +89,9 @@ public class CategoriasController : ControllerBase
     }
 
     [HttpPatch("{id:int}")]
-    public async Task<ActionResult<CategoriaDTO>> Patch([FromRoute] int id, [FromBody] JsonPatchDocument<CategoriaPatchDTO> categoriaPatchDTO)
+    public async Task<ActionResult<CategoriaDTO>> Patch([FromRoute] int id, [FromBody] JsonPatchDocument<CategoriaPatchDTO> jsonPatchDTO)
     { 
-        if (categoriaPatchDTO is null || id <= 0)
+        if (jsonPatchDTO is null || id <= 0)
             return BadRequest("Dados inválidos.");
 
         var categoriaDTO = await _categoriaService.GetById(id);
@@ -96,9 +99,9 @@ public class CategoriasController : ControllerBase
         if (categoriaDTO is null)
             return NotFound("Categoria não encontrada.");
 
-        var patchDTO = ConverteJsonPatchParaPatchDto(categoriaPatchDTO, categoriaDTO);
+        var categoriaPatchDTO = ConverteJsonPatchParaPatchDto(jsonPatchDTO, categoriaDTO);
 
-        var categoriaDTOAtualizada = await _categoriaService.Patch(id, patchDTO);
+        var categoriaDTOAtualizada = await _categoriaService.Patch(id, categoriaPatchDTO);
 
         return Ok(categoriaDTOAtualizada);
 
@@ -106,15 +109,15 @@ public class CategoriasController : ControllerBase
 
     // métodos auxiliares
 
-    private CategoriaPatchDTO ConverteJsonPatchParaPatchDto(JsonPatchDocument<CategoriaPatchDTO> patchDoc, CategoriaDTO categoriaAtual)
+    private CategoriaPatchDTO ConverteJsonPatchParaPatchDto(JsonPatchDocument<CategoriaPatchDTO> jsonPatchDTO, CategoriaDTO categoriaDTO)
     {
         var patchDTO = new CategoriaPatchDTO
         {
-            Nome = categoriaAtual.Nome,
-            ImagemUrl = categoriaAtual.ImagemUrl
+            Nome = categoriaDTO.Nome,
+            ImagemUrl = categoriaDTO.ImagemUrl
         };
 
-        foreach (var operation in patchDoc.Operations)
+        foreach (var operation in jsonPatchDTO.Operations)
         {
             var propertyName = operation.path.TrimStart('/').ToLower();
 
