@@ -36,14 +36,7 @@ public class CategoriasController : ControllerBase
                 return NotFound("Nenhuma categoria encontrada.");
             }
 
-            var cacheOptions = new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
-                SlidingExpiration = TimeSpan.FromSeconds(15),
-                Priority = CacheItemPriority.High
-            };
-
-            _cache.Set(CacheCategoriasKey, categoriasDTO, cacheOptions);
+            SetCache(CacheCategoriasKey, categoriasDTO);
         }
 
         return Ok(categoriasDTO);
@@ -52,9 +45,9 @@ public class CategoriasController : ControllerBase
     [HttpGet("{id:int}", Name = "ObterCategorias")]
     public async Task<ActionResult<CategoriaDTO>> GetById(int id)
     {
-        var CacheCategoriaKey = $"CacheCategoria_{id}";
+        var cacheKey = GetCategoriaCacheKey(id);
 
-        if (!_cache.TryGetValue(CacheCategoriaKey, out CategoriaDTO? categoriaDTO))
+        if (!_cache.TryGetValue(cacheKey, out CategoriaDTO? categoriaDTO))
         {
             categoriaDTO = await _categoriaService.GetById(id);
 
@@ -63,14 +56,7 @@ public class CategoriasController : ControllerBase
                 return NotFound("Categoria não encontrada.");
             }
 
-            var cacheOptions = new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
-                SlidingExpiration = TimeSpan.FromSeconds(15),
-                Priority = CacheItemPriority.High
-            };
-
-            _cache.Set(CacheCategoriaKey, categoriaDTO, cacheOptions);
+            SetCache(cacheKey, categoriaDTO);
         }
 
         return Ok(categoriaDTO);
@@ -82,7 +68,9 @@ public class CategoriasController : ControllerBase
         if (categoriaDTO is null)
             return BadRequest("Dados inválidos.");
 
-        await _categoriaService.Add(categoriaDTO);
+        categoriaDTO = await _categoriaService.Add(categoriaDTO);
+
+        InvalidateCacheAfterChange(categoriaDTO.Id, categoriaDTO);
 
         return new CreatedAtRouteResult(
             routeName: "ObterCategorias",
@@ -104,6 +92,8 @@ public class CategoriasController : ControllerBase
         if (categoriaDTO is null)
             return NotFound("Categoria não encontrada.");
 
+        InvalidateCacheAfterChange(id, categoriaDTO);
+
         return Ok(categoriaDTO);
     }
 
@@ -114,6 +104,8 @@ public class CategoriasController : ControllerBase
 
         if (categoriaDTO is null)
             return NotFound("Categoria não encontrada.");
+
+        InvalidateCacheAfterChange(id);
 
         return Ok(categoriaDTO);
     }
@@ -132,6 +124,8 @@ public class CategoriasController : ControllerBase
         var categoriaPatchDTO = ConverteJsonPatchParaPatchDto(jsonPatchDTO, categoriaDTO);
 
         var categoriaDTOAtualizada = await _categoriaService.Patch(id, categoriaPatchDTO);
+
+        InvalidateCacheAfterChange(id, categoriaDTOAtualizada);
 
         return Ok(categoriaDTOAtualizada);
 
@@ -178,6 +172,31 @@ public class CategoriasController : ControllerBase
         }
 
         return patchDTO;
+    }
+
+    private String GetCategoriaCacheKey(int id) => $"CacheCategoria_{id}";
+
+    private void SetCache<T>(string key, T data)
+    {
+        var cacheOptions = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+            SlidingExpiration = TimeSpan.FromSeconds(15),
+            Priority = CacheItemPriority.High
+        };
+
+        _cache.Set(key, data, cacheOptions);
+    }
+
+    private void InvalidateCacheAfterChange(int id, CategoriaDTO? categoriaDTO = null)
+    {
+        _cache.Remove(GetCategoriaCacheKey(id));
+        _cache.Remove(CacheCategoriasKey);
+
+        if (categoriaDTO != null)
+        { 
+            SetCache(GetCategoriaCacheKey(id), categoriaDTO);
+        }
     }
 
 }

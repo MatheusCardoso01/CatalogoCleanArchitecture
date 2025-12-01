@@ -11,7 +11,7 @@ public interface ICategoriaService
 {
     Task<IEnumerable<CategoriaDTO>> GetCategorias();
     Task<CategoriaDTO> GetById(int id);
-    Task Add(CategoriaDTO categoriaDto);
+    Task<CategoriaDTO> Add(CategoriaDTO categoriaDto);
     Task<CategoriaDTO> Update(CategoriaDTO categoriaDto);
     Task<CategoriaDTO> Remove(int id);
     Task<CategoriaDTO?> Patch(int id, CategoriaPatchDTO categoriaPatchDTO);

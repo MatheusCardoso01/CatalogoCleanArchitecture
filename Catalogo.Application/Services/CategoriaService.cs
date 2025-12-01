@@ -36,11 +36,13 @@ public class CategoriaService : ICategoriaService
         return _mapper.Map<CategoriaDTO>(categoriaEntity);
     }
 
-    public async Task Add(CategoriaDTO categoriaDto)
+    public async Task<CategoriaDTO> Add(CategoriaDTO categoriaDto)
     {
         var categoriaEntity = _mapper.Map<Categoria>(categoriaDto);
 
-        await _categoriaRepository.CreateAsync(categoriaEntity);
+        categoriaEntity = await _categoriaRepository.CreateAsync(categoriaEntity);
+
+        return _mapper.Map<CategoriaDTO>(categoriaEntity);
     }
 
     public async Task<CategoriaDTO> Update(CategoriaDTO categoriaDTO)

@@ -45,7 +45,7 @@ public class ProdutosController : ControllerBase
         if (produtoDTO is null)
             return BadRequest("Dados inválidos");
 
-        await _produtoService.Add(produtoDTO);
+        produtoDTO = await _produtoService.Add(produtoDTO);
 
         return new CreatedAtRouteResult(
             routeName: "ObterProdutos",

@@ -36,11 +36,13 @@ public class ProdutoService : IProdutoService
         return _mapper.Map<ProdutoDTO>(produtoEntity);
     }
 
-    public async Task Add(ProdutoDTO produtoDto)
+    public async Task<ProdutoDTO> Add(ProdutoDTO produtoDto)
     {
         var produtoEntity = _mapper.Map<Produto>(produtoDto);
 
-        await _produtoRepository.CreateAsync(produtoEntity);
+        produtoEntity = await _produtoRepository.CreateAsync(produtoEntity);
+
+        return _mapper.Map<ProdutoDTO>(produtoEntity);
     }
 
     public async Task<ProdutoDTO> Update(ProdutoDTO produtoDTO)
