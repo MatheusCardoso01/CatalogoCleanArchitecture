@@ -21,6 +21,7 @@ public class CategoriaRepository : ICategoriaRepository
 
     public async Task<IEnumerable<Categoria>> GetCategoriasAsync()
     {
+        System.Threading.Thread.Sleep(3000); // Simula uma operação demorada quando não usa cache
         var categorias = await _context.Categorias.ToListAsync();
 
         return categorias;
@@ -28,6 +29,7 @@ public class CategoriaRepository : ICategoriaRepository
 
     public async Task<Categoria> GetByIdAsync(int id)
     {
+        System.Threading.Thread.Sleep(3000); // Simula uma operação demorada quando não usa cache
         var categoria = await _context.Categorias.FirstOrDefaultAsync(c => c.Id == id);
 
         return categoria;

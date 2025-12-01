@@ -6,6 +6,7 @@ using Catalogo.Domain.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Catalogo.API.Controllers;
 
@@ -14,20 +15,35 @@ namespace Catalogo.API.Controllers;
 public class CategoriasController : ControllerBase
 {
     private readonly ICategoriaService _categoriaService;
+    private readonly IMemoryCache _cache;
+    private const string CacheCategoriasKey = "CacheCategorias";
 
-    public CategoriasController(ICategoriaService categoriaService)
+    public CategoriasController(ICategoriaService categoriaService, IMemoryCache cache)
     {
         _categoriaService = categoriaService;
+        _cache = cache;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategorias()
-    { 
-        var categoriasDTO = await _categoriaService.GetCategorias();
-
-        if (categoriasDTO == null || !categoriasDTO.Any())
+    {
+        if (!_cache.TryGetValue(CacheCategoriasKey, out IEnumerable<CategoriaDTO>? categoriasDTO))
         {
-            return NotFound("Nenhuma categoria encontrada.");
+            categoriasDTO = await _categoriaService.GetCategorias();
+
+            if (categoriasDTO is null || !categoriasDTO.Any())
+            {
+                return NotFound("Nenhuma categoria encontrada.");
+            }
+
+            var cacheOptions = new MemoryCacheEntryOptions()
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(15),
+                Priority = CacheItemPriority.High
+            };
+
+            _cache.Set(CacheCategoriasKey, categoriasDTO, cacheOptions);
         }
 
         return Ok(categoriasDTO);
@@ -35,12 +51,26 @@ public class CategoriasController : ControllerBase
 
     [HttpGet("{id:int}", Name = "ObterCategorias")]
     public async Task<ActionResult<CategoriaDTO>> GetById(int id)
-    { 
-        var categoriaDTO = await _categoriaService.GetById(id);
+    {
+        var CacheCategoriaKey = $"CacheCategoria_{id}";
 
-        if (categoriaDTO == null)
+        if (!_cache.TryGetValue(CacheCategoriaKey, out CategoriaDTO? categoriaDTO))
         {
-            return NotFound("Categoria não encontrada.");
+            categoriaDTO = await _categoriaService.GetById(id);
+
+            if (categoriaDTO is null)
+            {
+                return NotFound("Categoria não encontrada.");
+            }
+
+            var cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30),
+                SlidingExpiration = TimeSpan.FromSeconds(15),
+                Priority = CacheItemPriority.High
+            };
+
+            _cache.Set(CacheCategoriaKey, categoriaDTO, cacheOptions);
         }
 
         return Ok(categoriaDTO);
@@ -65,7 +95,7 @@ public class CategoriasController : ControllerBase
     public async Task<ActionResult<CategoriaDTO>> Put([FromRoute] int id, [FromBody] CategoriaDTO categoriaDTO)
     {
         if (id <= 0 || categoriaDTO is null || id != categoriaDTO.Id)
-        { 
+        {
             return BadRequest("Dados inválidos.");
         }
 
@@ -79,7 +109,7 @@ public class CategoriasController : ControllerBase
 
     [HttpDelete("{id:int}")]
     public async Task<ActionResult<CategoriaDTO>> Delete([FromRoute] int id)
-    { 
+    {
         var categoriaDTO = await _categoriaService.Remove(id);
 
         if (categoriaDTO is null)
@@ -90,7 +120,7 @@ public class CategoriasController : ControllerBase
 
     [HttpPatch("{id:int}")]
     public async Task<ActionResult<CategoriaDTO>> Patch([FromRoute] int id, [FromBody] JsonPatchDocument<CategoriaPatchDTO> jsonPatchDTO)
-    { 
+    {
         if (jsonPatchDTO is null || id <= 0)
             return BadRequest("Dados inválidos.");
 
