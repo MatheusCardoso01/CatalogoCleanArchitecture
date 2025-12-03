@@ -17,5 +17,7 @@ public class DomainToDTOMappingProfile : Profile
         CreateMap<Categoria, CategoriaPatchDTO>().ReverseMap();
         CreateMap<Produto, ProdutoDTO>().ReverseMap();
         CreateMap<Produto, ProdutoPatchDTO>().ReverseMap();
+        CreateMap<Usuario, UsuarioDTO>().ReverseMap();
+        CreateMap<Usuario, UsuarioRegistroDTO>().ReverseMap();
     }
 }

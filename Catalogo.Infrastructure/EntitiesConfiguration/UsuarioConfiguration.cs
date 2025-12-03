@@ -27,14 +27,14 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .IsUnique();
 
         builder.Property(u => u.PasswordHash)
+            .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(u => u.Role)
             .IsRequired();
 
         builder.Property(u => u.DataCriacao)
-            .IsRequired()
-            .HasDefaultValueSql("GETDATE()");
+            .IsRequired();
 
         builder.Property(u => u.Ativo)
             .IsRequired()
@@ -45,6 +45,5 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         builder.Property(u => u.RefreshTokenExpiryTime)
             .IsRequired(false);
-
     }
 }

@@ -26,6 +26,7 @@ public static class DependencyInjectionApi
         services.AddScoped<IProdutoRepository, ProdutoRepository>();
         services.AddScoped<IProdutoService, ProdutoService>();
         services.AddScoped<ICategoriaService, CategoriaService>();
+        services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
         services.AddAutoMapper(config =>
         {
