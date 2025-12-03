@@ -9,9 +9,9 @@ namespace Catalogo.Application.Interfaces;
 
 public interface IUsuarioService
 {
-    Task<IEnumerable<UsuarioDTO>> GetUsuarios(int id);
+    Task<IEnumerable<UsuarioDTO>> GetUsuarios();
     Task<UsuarioDTO> GetById(int id);
-    Task<UsuarioDTO> Add(UsuarioDTO usuarioDto);
-    Task<UsuarioDTO> Update(UsuarioDTO usuarioDto);
+    Task<UsuarioDTO> Add(UsuarioRegistroDTO usuarioRegistroDTO);
+    Task<UsuarioDTO> Update(UsuarioDTO usuarioDTO);
     Task<UsuarioDTO> Remove(int id);
 }

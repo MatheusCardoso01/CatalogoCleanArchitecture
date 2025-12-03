@@ -16,5 +16,6 @@ public class UsuarioRegistroDTO
     public string Email { get; set; }
 
     [Required(ErrorMessage = "Senha é obrigatória")]
+    [StringLength(100, MinimumLength = 3, ErrorMessage = "Senha deve ter entre 3 e 100 caracteres")]
     public string Password { get; set; }
 }

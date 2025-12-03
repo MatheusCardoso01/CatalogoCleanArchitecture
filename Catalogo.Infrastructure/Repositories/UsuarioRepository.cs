@@ -64,12 +64,20 @@ public class UsuarioRepository : IUsuarioRepository
         return usuario;
     }
 
-    public async Task<Usuario> UpdateAsync(Usuario usuario)
+    public async Task<Usuario> UpdateAsync(Usuario usuarioAtualizado, Usuario usuarioExistente)
     {
-        _context.Usuarios.Update(usuario);
+        usuarioExistente.Update(
+            usuarioAtualizado.UserName,
+            usuarioAtualizado.Email,
+            usuarioExistente.PasswordHash,
+            usuarioAtualizado.Role,
+            usuarioExistente.DataCriacao,
+            usuarioAtualizado.Ativo
+        );
+
         await _context.SaveChangesAsync();
 
-        return usuario;
+        return usuarioExistente;
     }
 
     public async Task<Usuario> RemoveAsync(Usuario usuario)
@@ -85,8 +93,7 @@ public class UsuarioRepository : IUsuarioRepository
     {
         if (usuario is not null)
         {
-            usuario.RefreshToken = refreshToken;
-            usuario.RefreshTokenExpiryTime = expireTime;
+            usuario.SetRefreshToken(refreshToken, expireTime);
 
             await _context.SaveChangesAsync();
         }
@@ -98,8 +105,7 @@ public class UsuarioRepository : IUsuarioRepository
 
         if (usuario is not null)
         {
-            usuario.RefreshToken = null;
-            usuario.RefreshTokenExpiryTime = null;
+            usuario.SetRefreshToken(null, null);
 
             await _context.SaveChangesAsync();
         }

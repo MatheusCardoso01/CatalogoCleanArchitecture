@@ -12,7 +12,7 @@ public interface IUsuarioRepository
     Task<IEnumerable<Usuario>> GetUsuariosAsync();
     Task<Usuario> GetByIdAsync(int id);
     Task<Usuario> CreateAsync(Usuario usuario);
-    Task<Usuario> UpdateAsync(Usuario usuario);
+    Task<Usuario> UpdateAsync(Usuario usuarioAtualizado, Usuario usuarioExistente);
     Task<Usuario> RemoveAsync(Usuario usuario);
     Task<Usuario> GetByEmailAsync(string email);
     Task<Usuario> GetByUserNameAsync(string userName);

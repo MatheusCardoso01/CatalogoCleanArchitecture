@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Catalogo.Application.DTOs;
 using Catalogo.Application.Interfaces;
 using Catalogo.Domain.Interfaces;
 using Catalogo.Infrastructure.Security;
@@ -15,17 +16,15 @@ public class AuthService : IAuthService
     private IJwtTokenService _jwtTokenService;
     private IPasswordHasher _passwordHasher;
     private IUsuarioRepository _usuarioRepository;
-    private readonly IMapper _mapper;
 
-    public AuthService(IUsuarioRepository usuarioRepository, IMapper mapper, IJwtTokenService jwtTokenService, IPasswordHasher passwordHasher)
+    public AuthService(IUsuarioRepository usuarioRepository, IJwtTokenService jwtTokenService, IPasswordHasher passwordHasher)
     {
         _usuarioRepository = usuarioRepository;
-        _mapper = mapper;
         _jwtTokenService = jwtTokenService;
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<string> Authenticate(string username, string password)
+    public async Task<TokenDTO> Authenticate(string username, string password)
     {
         var usuario = await _usuarioRepository.GetByUserNameAsync(username);
 
@@ -43,10 +42,15 @@ public class AuthService : IAuthService
 
         await _usuarioRepository.UpdateRefreshTokenAsync(usuario, refreshToken, refreshTokenExpiryTime);
 
-        return token;
+        return new TokenDTO
+        {
+            AccessToken = token,
+            RefreshToken = refreshToken,
+            RefreshTokenExpiration = refreshTokenExpiryTime.Minute + " minutos"
+        };
     }
 
-    public async Task<string> RenewAccessToken(string refreshToken)
+    public async Task<TokenDTO> RenewAccessToken(string refreshToken)
     {
         var usuario = await _usuarioRepository.GetByRefreshTokenAsync(refreshToken);
 
@@ -55,11 +59,23 @@ public class AuthService : IAuthService
 
         var token = _jwtTokenService.GenerateAccessToken(usuario);
 
-        return token;
+        return new TokenDTO
+        { 
+            AccessToken = token,
+            RefreshToken = refreshToken,
+            RefreshTokenExpiration = ((int) (usuario.RefreshTokenExpiryTime.Value - DateTime.UtcNow).TotalMinutes) + " minutos"
+        };
     }
 
     public async Task<bool> RevokeToken(int usuarioID)
     {
-        throw new NotImplementedException();
+        var usuario = await _usuarioRepository.GetByIdAsync(usuarioID);
+
+        if (usuario is null || !usuario.Ativo)
+            return false;
+
+        await _usuarioRepository.RevokeRefreshTokenAsync(usuarioID);
+
+        return true;
     }
 }
