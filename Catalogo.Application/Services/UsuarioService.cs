@@ -90,9 +90,9 @@ public class UsuarioService : IUsuarioService
 
     private async Task VerifyData(Usuario usuarioEntity)
     {
-        var otherSameEmail = await _usuarioRepository.GetByEmailAsync(usuarioEntity.Email);
+        var otherUserSameEmail = await _usuarioRepository.GetByEmailAsync(usuarioEntity.Email);
 
-        if (otherSameEmail is not null && otherSameEmail.Id != usuarioEntity.Id)
+        if (otherUserSameEmail is not null && otherUserSameEmail.Id != usuarioEntity.Id)
             throw new InvalidOperationException("Email já cadastrado");
 
         var otherUserSameName = await _usuarioRepository.GetByUserNameAsync(usuarioEntity.UserName);

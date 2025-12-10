@@ -46,7 +46,7 @@ public class AuthService : IAuthService
         {
             AccessToken = token,
             RefreshToken = refreshToken,
-            RefreshTokenExpiration = refreshTokenExpiryTime.Minute + " minutos"
+            RefreshTokenExpiration = ((int)(refreshTokenExpiryTime - DateTime.UtcNow).TotalMinutes) + " minutos"
         };
     }
 
@@ -63,7 +63,7 @@ public class AuthService : IAuthService
         { 
             AccessToken = token,
             RefreshToken = refreshToken,
-            RefreshTokenExpiration = ((int) (usuario.RefreshTokenExpiryTime.Value - DateTime.UtcNow).TotalMinutes) + " minutos"
+            RefreshTokenExpiration = ((int)(usuario.RefreshTokenExpiryTime.Value - DateTime.UtcNow).TotalMinutes) + " minutos"
         };
     }
 

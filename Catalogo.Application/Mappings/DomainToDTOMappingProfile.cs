@@ -17,7 +17,18 @@ public class DomainToDTOMappingProfile : Profile
         CreateMap<Categoria, CategoriaPatchDTO>().ReverseMap();
         CreateMap<Produto, ProdutoDTO>().ReverseMap();
         CreateMap<Produto, ProdutoPatchDTO>().ReverseMap();
-        CreateMap<Usuario, UsuarioDTO>().ReverseMap();
-        CreateMap<Usuario, UsuarioRegistroDTO>().ReverseMap();
+        CreateMap<Usuario, UsuarioDTO>().ReverseMap();        
+        // REMOVIDO: CreateMap<Usuario, UsuarioRegistroDTO>().ReverseMap();
+        
+        // Mapeamento de UsuarioRegistroDTO -> Usuario COM VALIDAÇÃO
+        CreateMap<UsuarioRegistroDTO, Usuario>()
+            .ConstructUsing(dto => new Usuario(
+                dto.UserName,
+                dto.Email,
+                dto.Password,
+                "User",
+                DateTime.UtcNow,
+                true
+            ));
     }
 }

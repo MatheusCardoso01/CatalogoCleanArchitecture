@@ -16,6 +16,11 @@ public class JwtTokenService : IJwtTokenService
 {
     private readonly IConfiguration _config;
 
+    public JwtTokenService(IConfiguration config)
+    {
+        _config = config;
+    }
+
     public string GenerateAccessToken(Usuario usuario)
     {
         var key = _config["Jwt:SecretKey"] ?? throw new InvalidOperationException("SecretKey not found in configuration.");

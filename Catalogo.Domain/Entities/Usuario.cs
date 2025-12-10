@@ -27,6 +27,8 @@ public class Usuario : Entity
     public DateTime? RefreshTokenExpiryTime { get; private set; }
 
 
+    private Usuario() { }
+
     public Usuario(string? userName, string? email, string passwordHash, string? role, DateTime dataCriacao, bool ativo)
     {
         ValidateDomain(userName, email, passwordHash, role, dataCriacao, ativo);
