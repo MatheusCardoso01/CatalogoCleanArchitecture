@@ -65,11 +65,11 @@ public class UsuarioService : IUsuarioService
         if (usuarioExistente is null)
             return null;
 
-        var usuarioEntity = _mapper.Map<Usuario>(usuarioDTO);
+        var usuarioAtualizado = _mapper.Map<Usuario>(usuarioDTO);
 
-        await VerifyData(usuarioEntity);
+        await VerifyData(usuarioAtualizado);
 
-        usuarioEntity = await _usuarioRepository.UpdateAsync(usuarioEntity, usuarioExistente);
+        usuarioAtualizado = await _usuarioRepository.UpdateAsync(usuarioAtualizado, usuarioExistente);
 
         return usuarioDTO;
     }
